@@ -1,0 +1,40 @@
+import requests
+import bs4
+from bs4 import BeautifulSoup
+
+
+def getHTMLText(url):
+    try:
+        r = requests.get(url, timeout=30)
+        r.raise_for_status
+        r.encoding=r.apparent_encoding
+        return r.text
+    except:
+        return ''
+
+
+def fillUnivslist(ulist, html):
+    soup = BeautifulSoup(html, 'html.parser')
+    for i in soup.find('tbody').children:
+        if isinstance(i, bs4.element.Tag):
+            tds = i('td')
+            ulist.append([tds[0].text.strip(), tds[1].text.strip(), tds[3].text.strip()])
+
+
+def printUnivslist(ulist, num):
+    print('{:^10}\t{:^20}\t{:^10}'.format('排名','学校名称','总分',chr(12288)))
+    for i in range(num):
+        u = ulist[i]
+        print('{:^10}\t{:^20}\t{:^10}'.format(u[0],u[1],u[2],chr(12288)))
+
+
+def main():
+
+    ulist = []
+    url = 'https://www.shanghairanking.cn/rankings/gras/2020/RS0510'
+    html = getHTMLText(url)
+    fillUnivslist(ulist, html)
+    printUnivslist(ulist, 20)
+
+
+main()
